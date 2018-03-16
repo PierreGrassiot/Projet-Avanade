@@ -5,68 +5,55 @@ using UnityEngine.Windows.Speech;
 using System;
 
 
-public class VoiceManager : MonoBehaviour
+public class VoiceManager : MonoBehaviour   //but : gérer les déplacements de la scène grâce à la commande vocale
 {
-    KeywordRecognizer keywordRecognizer = null;
-    Dictionary<string, System.Action> keywords = new Dictionary<string, System.Action>();
-    private bool placing = false;
-    
-    //public event EventHandler SceneMoved;
+    public GameObject plane;                //objet que l'on affichera en mode déplacement
 
-    // Use this for initialization
-    void Start()
+    private KeywordRecognizer keywordRecognizer = null;
+    private Dictionary<string, System.Action> keywords = new Dictionary<string, System.Action>();       //map qui lie une chaîne de caractères (prononcée par l'utilisateur) à une suite d'instructions
+    private bool placing = false;           //booléen décrivant si on se trouve en mode déplacement
+
+    void Start() //au lancement
     {
+        /* on ajoute à la map la commande vocale 'Move' qui permet de passer en mode déplacement et d'affciher le plan */
         keywords.Add("Move", () =>
         {
             placing = true;
-            SpatialMapping.Instance.DrawVisualMeshes = true;
+            plane.GetComponent<Renderer>().enabled = true;
         });
 
+        /* on ajoute à la map la commande vocale 'Done' qui permet de quitter le mode déplacement et de masquer le plan */
         keywords.Add("Done", () =>
         {
             placing = false;
-            SpatialMapping.Instance.DrawVisualMeshes = false;
-            //OnSceneMoved(EventArgs.Empty);
+            plane.GetComponent<Renderer>().enabled = false;
         });
 
-        // Tell the KeywordRecognizer about our keywords.
+        //on notifie le KeywordRecognizer de nos mots-clés
         keywordRecognizer = new KeywordRecognizer(keywords.Keys.ToArray());
 
-        // Register a callback for the KeywordRecognizer and start recognizing!
+        //on lance le callback, c'est-à-dire la reconnaissance vocale
         keywordRecognizer.OnPhraseRecognized += KeywordRecognizer_OnPhraseRecognized;
         keywordRecognizer.Start();
     }
 
-    /*protected virtual void OnSceneMoved(EventArgs e)
+
+    void Update() //à chaque frame
     {
-        EventHandler handler = SceneMoved;
-        if (handler != null)
+        if (placing)            //si on est en mode déplacement
         {
-            handler(this, e);
-        }
-    }*/
-
-
-    void Update()
-    {
-        // If the user is in placing mode,
-        // update the placement to match the user's gaze.
-
-        if (placing)
-        {
-            // Do a raycast into the world that will only hit the Spatial Mapping mesh.
+            //on récupère la position et la direction du regard de l'utilisateur
             var headPosition = Camera.main.transform.position;
             var gazeDirection = Camera.main.transform.forward;
 
+            //on lance un rayon dans l'environnement entre l'utilisateur et le maillage issu du Spatial Mapping
             RaycastHit hitInfo;
-            if (Physics.Raycast(headPosition, gazeDirection, out hitInfo,
-                30.0f, SpatialMapping.PhysicsRaycastMask))
+            if (Physics.Raycast(headPosition, gazeDirection, out hitInfo, 30.0f, SpatialMapping.PhysicsRaycastMask))
             {
-                // Move this object's parent object to
-                // where the raycast hit the Spatial Mapping mesh.
+                //on déplace l'objet parent (nos objets à afficher) à l'endroit où le rayon percute le maillage du Spatial Mapping
                 this.transform.parent.position = hitInfo.point;
 
-                // Rotate this object's parent object to face the user.
+                //on déplace l'objet parent de façon à ce qu'il soit face à l'utilisateur
                 Quaternion toQuat = Camera.main.transform.localRotation;
                 toQuat.x = 0;
                 toQuat.z = 0;
@@ -75,12 +62,12 @@ public class VoiceManager : MonoBehaviour
         }
     }
 
-    private void KeywordRecognizer_OnPhraseRecognized(PhraseRecognizedEventArgs args)
+    private void KeywordRecognizer_OnPhraseRecognized(PhraseRecognizedEventArgs args)  //méthode callback appelée à chaque fois qu'un mot est prononcé
     {
         System.Action keywordAction;
-        if (keywords.TryGetValue(args.text, out keywordAction))
+        if (keywords.TryGetValue(args.text, out keywordAction))     //on essaye de récupérer le mot dans la map
         {
-            keywordAction.Invoke();
+            keywordAction.Invoke();                //si on y arrive, on exécute les instrcutions correspondantes
         }
     }
 }

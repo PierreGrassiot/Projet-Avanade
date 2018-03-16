@@ -5,30 +5,25 @@ public class SpatialMapping : MonoBehaviour {
 
     public static SpatialMapping Instance { private set; get; }
 
-    [HideInInspector]
     public static int PhysicsRaycastMask;
 
-    [Tooltip("The material to use when rendering Spatial Mapping data.")]
     public Material DrawMaterial;
 
-    [Tooltip("If true, the Spatial Mapping data will be rendered.")]
     public bool drawVisualMeshes = false;
     
-    // If true, Spatial Mapping will be enabled. 
+    // booléen activant/désactivant le spatial mapping 
     private bool mappingEnabled = true;
 
-    // The layer to use for spatial mapping collisions.
+    // initialisation d'un layer pour les collisions
     private int physicsLayer = 31;
 
-    // Handles rendering of spatial mapping meshes.
+    // renderer associé au maillage du spatial mapping
     private SpatialMappingRenderer spatialMappingRenderer;
 
-    // Creates/updates environment colliders to work with physics.
+    // objet permettant la gestion physique des collisions
     private SpatialMappingCollider spatialMappingCollider;
 
-    /// <summary>
-    /// Determines if the spatial mapping meshes should be rendered.
-    /// </summary>
+    // Détermine quand le amillage doit être affiché
     public bool DrawVisualMeshes
     {
         get
@@ -41,19 +36,17 @@ public class SpatialMapping : MonoBehaviour {
 
             if (drawVisualMeshes)
             {
-                spatialMappingRenderer.visualMaterial = DrawMaterial;
-                spatialMappingRenderer.renderState = SpatialMappingRenderer.RenderState.Visualization;
+                spatialMappingRenderer.visualMaterial = DrawMaterial;   // chargement du maillage
+                spatialMappingRenderer.renderState = SpatialMappingRenderer.RenderState.Visualization;  // affichage du maillage
             }
             else
             {
-                spatialMappingRenderer.renderState = SpatialMappingRenderer.RenderState.None;
+                spatialMappingRenderer.renderState = SpatialMappingRenderer.RenderState.None;   // maillage non affiché
             }
         }
     }
  
-    /// <summary>
-    /// Enables/disables spatial mapping rendering and collision.
-    /// </summary>
+    // Gère l'activation du rendu et des collisions du maillage
     public bool MappingEnabled
     {
         get
@@ -74,12 +67,11 @@ public class SpatialMapping : MonoBehaviour {
         Instance = this;
     }
 
-    // Use this for initialization
-    void Start()
+    void Start()    // au lancement
     {
-        spatialMappingRenderer = gameObject.GetComponent<SpatialMappingRenderer>();
+        spatialMappingRenderer = gameObject.GetComponent<SpatialMappingRenderer>(); // récupération du renderer natif associé au spatial mapping
         spatialMappingRenderer.surfaceParent = this.gameObject;
-        spatialMappingCollider = gameObject.GetComponent<SpatialMappingCollider>();
+        spatialMappingCollider = gameObject.GetComponent<SpatialMappingCollider>(); // récupération du collider natif associé au spatial mapping
         spatialMappingCollider.surfaceParent = this.gameObject;
         spatialMappingCollider.layer = physicsLayer;
         PhysicsRaycastMask = 1 << physicsLayer;

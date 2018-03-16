@@ -11,107 +11,44 @@ using System;
 
 namespace HoloToolkit.Unity.Examples
 {
-    public class ButtonReset : InteractionReceiver
+    public class ButtonReset : InteractionReceiver          //but : réinitialiser la scène
     {
-        public GameObject textObjectState;
-        private TextMesh txt;
-        public List<GameObject> object_list;
-        public Transform target;
-        public GameObject reference;
+        public List<GameObject> object_list;                //liste des objets qui peuvent être reset
+        public GameObject reference;                        //objet permettant d'obtenir le vecteur de translation appliqué à l'ensemble de la scène quand elle est déplacée
 
-        //private List<Transform> posReset;
-        private List<Vector3> posReset;
-        private List<Quaternion> rotReset;
-        private Vector3 coordRef;
+        private Vector3 coordRef;                           //coordonnées de l'objet reference
 
-        //private VoiceManager voiceManager;
+        private List<Vector3> posReset;                     //liste des positions initiales des objets
+        private List<Quaternion> rotReset;                  //liste des orientations initiales des objets
 
-        void Start()
-        {
-            //voiceManager = FindObjectOfType(typeof(VoiceManager)) as VoiceManager;
-
-            txt = textObjectState.GetComponentInChildren<TextMesh>();
-            posReset = new List<Vector3>();
-            rotReset = new List<Quaternion>();
-
-            foreach (GameObject myObj in object_list)
-            {
-                myObj.SetActive(true);
-                posReset.Add(myObj.transform.position);
-                rotReset.Add(myObj.transform.rotation);
-                myObj.SetActive(false);
-            }
-
-            coordRef = reference.transform.position;
-
-            //voiceManager.SceneMoved += c_moved;
-        }
-
-        /*static void c_moved (object sender, EventArgs e)
+        void Start() //au lancement
         {
             posReset = new List<Vector3>();
             rotReset = new List<Quaternion>();
 
-            foreach (GameObject myObj in object_list)
+            foreach (GameObject myObj in object_list)       //on parcourt les objets à traiter
             {
-                myObj.SetActive(true);
-                posReset.Add(myObj.transform.position);
-                rotReset.Add(myObj.transform.rotation);
-                myObj.SetActive(false);
+                posReset.Add(myObj.transform.position);     //on ajoute les vecteurs de position de chaque objet à la liste des positions
+                rotReset.Add(myObj.transform.rotation);     //on ajoute les vecteurs d'orientation de chaque objet à la liste des orientations
             }
-        }*/    
-
-        
-
-        protected override void FocusEnter(GameObject obj, PointerSpecificEventData eventData)
-        {
-            txt.text = "";
-            Debug.Log(obj.name + " : FocusEnter");
-            foreach (GameObject myobj in object_list)
-            {
-                if (myobj.activeSelf)
-                {
-                    txt.text += myobj.name + " x= " + myobj.transform.position.x + "  y= " + myobj.transform.position.y + "  z= " + myobj.transform.position.z + "\n";
-                }
-            }
+            coordRef = reference.transform.position;        //on récupère les coordonnées de l'objet de référence
         }
-
-        protected override void FocusExit(GameObject obj, PointerSpecificEventData eventData)
+   
+        protected override void InputDown(GameObject obj, InputEventData eventData)  //à l'appui sur le bouton
         {
-            Debug.Log(obj.name + " : FocusExit");
-            txt.text = obj.name + " : FocusExit";
-        }
-
-        protected override void InputDown(GameObject obj, InputEventData eventData)
-        {
-            Debug.Log(obj.name + " : InputDown");
-          
             int k = 0;
-            Vector3 translation = reference.transform.position;
-            translation -= coordRef;
+            Vector3 translation = reference.transform.position;     //on récupère la position actuelle de l'objet de référence
+            translation -= coordRef;                                /*on calcule le vecteur de translation en faisant la différence 
+                                                                    entre les positions actuelle et initiale de l'objet de référence */
 
-            foreach (GameObject myobj in object_list)
+            foreach (GameObject myobj in object_list)       //on parcourt les objets à traiter
             {
-                if (myobj.activeSelf)
-                {
-                    //myobj.transform.position = new Vector3(myobj.transform.position.x, 1.5f, myobj.transform.position.z);
-                    //txt.text += myobj.name + " x= " + myobj.transform.position.x + "  y= " + myobj.transform.position.y + "  z= " + myobj.transform.position.z + "\n";
-
-                    //myobj.transform.LookAt(target);
-                    myobj.transform.rotation = rotReset[k];
-                    myobj.transform.position = posReset[k] + translation;
-                   
-                    myobj.SetActive(false);
-                    txt.text = obj.name + "  " + myobj.transform.position.y;
+                    myobj.transform.rotation = rotReset[k];                     //chaque objet est reset à son orientation initialle
+                    myobj.transform.position = posReset[k] + translation;       /*chaque objet est reset à sa position initialle,
+                                                                                à laquelle on ajoute le vecteur de translation qu'a subi l'ensemble de la scène*/
+                    myobj.SetActive(false);          //on masque tous les objets
                     k++;
-                }
             }
-        }
-
-        protected override void InputUp(GameObject obj, InputEventData eventData)
-        {
-            Debug.Log(obj.name + " : InputUp");
-            txt.text = obj.name + " : InputUp";
         }
     }
 }

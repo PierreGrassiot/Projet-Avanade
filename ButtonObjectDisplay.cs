@@ -10,63 +10,43 @@ using HoloToolkit.Unity.InputModule;
 
 namespace HoloToolkit.Unity.Examples
 {
-    public class ButtonObjectDisplay : InteractionReceiver
+    public class ButtonObjectDisplay : InteractionReceiver  //but : afficher l'objet lié au bouton
     {
-        public GameObject textObjectState;
-        private TextMesh txt;
-        public GameObject myObj, preview;
+        public GameObject myObj;                            //l'objet à afficher avec le bouton
+        public GameObject preview;                          //le modèle à afficher en prévisualisation
 
-        private float xInit, zInit;
-
-        void Start()
+        void Start() //au lancement
         {
-            txt = textObjectState.GetComponentInChildren<TextMesh>();
-
-            xInit = myObj.transform.position.x;
-            zInit = myObj.transform.position.z;
-
-            myObj.SetActive(false);
+            myObj.SetActive(false);                         //on désactive l'affichage de la pièce et de sa prévisualisation
             preview.SetActive(false);
         }
 
-        protected override void FocusEnter(GameObject obj, PointerSpecificEventData eventData)
+        protected override void FocusEnter(GameObject obj, PointerSpecificEventData eventData)  //lorsque l'on place le curseur sur le bouton
         {
-            Debug.Log(obj.name + " : FocusEnter");
-            txt.text = obj.name + " : FocusEnter";
             if (!preview.activeSelf)
             {
-                preview.SetActive(true);
+                preview.SetActive(true);           //si la prévisualisation n'est pas affichée, on l'affiche
             }
         }
 
-        protected override void FocusExit(GameObject obj, PointerSpecificEventData eventData)
+        protected override void FocusExit(GameObject obj, PointerSpecificEventData eventData)  //quand le curseur quitte le bouton
         {
-            Debug.Log(obj.name + " : FocusExit");
-            txt.text = obj.name + " : FocusExit";
             if (preview.activeSelf)
             {
-                preview.SetActive(false);
+                preview.SetActive(false);           //si la prévisualisation est affichée, on la masque
             }
         }
 
-        protected override void InputDown(GameObject obj, InputEventData eventData)
+        protected override void InputDown(GameObject obj, InputEventData eventData)         //sur un appui sur le bouton
         {
-            Debug.Log(obj.name + " : InputDown");
-            txt.text = obj.name + " : InputDown";
             if (myObj.activeSelf)
             {
-                myObj.SetActive(false);
+                myObj.SetActive(false);             //si l'objet est déjà affiché, on le masque
             }
             else
             {
-                myObj.SetActive(true);
+                myObj.SetActive(true);              //sinon, on l'affiche
             }
-        }
-
-        protected override void InputUp(GameObject obj, InputEventData eventData)
-        {
-            Debug.Log(obj.name + " : InputUp");
-            txt.text = obj.name + " : InputUp";
         }
     }
 }
