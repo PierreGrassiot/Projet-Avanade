@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class DisplayModelParts : MonoBehaviour {
+public class DisplayModelParts : MonoBehaviour {    //but : afficher les objets dans la scène à intervalle régulier
 
-    public List<GameObject> objList;                //liste d'objets à traiter
+    public List<GameObject> objList;                //liste des objets à traiter
     public int[] ordre;                             //ordre d'affichage à respecter
+    public int temps;
 
     //map qui associe un ordre de placement à l'objet correspondant
     private SortedDictionary<int, GameObject> objMap = new SortedDictionary<int, GameObject>();          
@@ -32,7 +33,7 @@ IEnumerator Actions()
         {
             objMap.TryGetValue(i, out currentObj);          //on récupère l'objet correspondant au numéro d'apparition suivant
             currentObj.SetActive(true);                     //on l'affiche
-            yield return new WaitForSecondsRealtime(3);     //on attend 3 secondes
+            yield return new WaitForSecondsRealtime(temps);     //on attend x secondes
         }
     }
 }

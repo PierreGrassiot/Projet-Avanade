@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using System;
 
-public class ValidateConstruction : MonoBehaviour {  //script de validation de la constrution en comparant les coordonnées
+public class ValidateConstruction : MonoBehaviour {  //but : valider la constrution en comparant les coordonnées
 
     public enum axes { x, y, z, rho, theta, phi };
 
@@ -67,8 +67,8 @@ public class ValidateConstruction : MonoBehaviour {  //script de validation de l
 
         if (Math.Abs(compareCree - compareRef) < precision)
         {
-            str += objCree.name + " " + " OK\n"; 
             //on affiche le nom de l'objet s'il est bien construit
+            str += objCree.name + " OK\n"; 
         }
     }
 }
